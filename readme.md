@@ -1,0 +1,33 @@
+## GPT2 Examples
+- GPT1
+    - Transformer의 Encoder 구조만 사용한 BERT와는 달리 Decoder 구조를 사용 ~ 순방향 마스크 어텐션 사용
+    - 마스크 언어 모델과 다음 문장 예측을 사용한 BERT와는 달리 앞의 단어를 사용해 다음 단어 예측하는 전통적인 방식 사용.
+    - 사전 학습이 아닌 본 학습에서도 모델 학습
+- GPT2
+    - GPT1과 유사. 몇개의 위치변경, 마지막 셀프 어텐션 레이어 이후 레이어 노멀라이제이션 적용.
+    - 다양한 영역의 텍스트를 사용해 사전학습됨. (이전엔 한 분야의 텍스트 사용)
+    - 가중치 개수 10배.
+    - BPE(Byte Pair Encoding) - 글자와 문자 사이의 적절한 단위를 찾아 나누는 방식.
+    ---
+- 감정분석 
+    - GPT마지막 출력에 dense 추가해서 binary classification을 하는 모델 구성.
+- 언어생성 using GPT2
+    - 생성시 사용하는 method - greedy
+        - 무조건 확률이 높은 단어 선택.
+        - greedy=False 일 경우, 확률 및 순위가 높은 단어들 중 무작위 생성.
+- NER(개체명 인식 - Named Entity Recognition)
+    - data : Naver NLP Challenge 2018's NER data
+    - 감정 분석, 자연어 추론 등은 gpt의 마지막 히든 벡터를 사용했지만, NER 에서는 문장의 모든 입력 값을 예측해야 하므로 모든 히든 벡터를 사용해야 함.
+    - Bert Tokenizer를 통과하면서 단어가 쪼개지므로(ex. 이순신 → 이, ##순, ##신) 라벨들도 이렇게 쪼개지는것을 감안해서 개수를 늘려줘야 함.
+    - gpt 출력(768(embed) * 111(max_sent_len)) 에서 dense 레이어를 거쳐 (111(max_sent_len) * 30(classes))로 출력.
+    - 정확하게 예측했는지 평가하기 위해 F1 score 구현
+        - precision과 recall을 합쳐 평가.
+        - $F1 score = 2\times \frac {Precision\times Recall}  {Precision + Recall}$
+- Text Similarity
+    - data : KorSTS(kakao)
+    - quora 데이터와 다르게 classification이 아니라 Regression - 0~5 scale로 유사도 산정
+    - 자연어 추론 모델과 유사하게 tokenizer시 text_pair에 두번째 문장 전달.
+    - 마지막 dense layer는 1개의 출력(유사도 값)을 가짐.
+    - 평가함수로 피어슨 상관계수 정의 - 두 변수의 공분산을 표준편차로 나눔
+    - $r_{xy}=\frac {cov(X,Y)} {\sigma_X\sigma_Y}$
+- "텐서플로 2와 머신러닝으로 시작하는 자연어 처리" 책의 [코드](https://github.com/NLP-kr/tensorflow-ml-nlp-tf2)를 기반으로 기록용으로 작성하였습니다.
